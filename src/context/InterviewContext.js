@@ -16,7 +16,9 @@ const initialState = {
   },
   stats: {
     totalQuestions: 0,
-    totalCategories: 0
+    totalCategories: 0,
+    totalViews: 0,
+    popularQuestions: 0
   }
 };
 
@@ -28,6 +30,7 @@ const ActionTypes = {
   SET_QUESTIONS: 'SET_QUESTIONS',
   SET_SELECTED_CATEGORY: 'SET_SELECTED_CATEGORY',
   SET_FILTERS: 'SET_FILTERS',
+  SET_STATS: 'SET_STATS',
   CLEAR_QUESTIONS: 'CLEAR_QUESTIONS',
   UPDATE_QUESTION_STATS: 'UPDATE_QUESTION_STATS',
   RESET_STATE: 'RESET_STATE'
@@ -110,6 +113,12 @@ const interviewReducer = (state, action) => {
               }
             : question
         )
+      };
+
+    case ActionTypes.SET_STATS:
+      return {
+        ...state,
+        stats: action.payload
       };
 
     case ActionTypes.RESET_STATE:
@@ -213,6 +222,18 @@ export const InterviewProvider = ({ children }) => {
       dispatch({ type: ActionTypes.CLEAR_QUESTIONS });
     },
 
+    // Fetch stats
+    fetchStats: async () => {
+      try {
+        const response = await interviewAPI.getStats();
+        if (response.success) {
+          dispatch({ type: ActionTypes.SET_STATS, payload: response.data });
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    },
+
     // Clear error
     clearError: () => {
       dispatch({ type: ActionTypes.SET_ERROR, payload: null });
@@ -226,8 +247,34 @@ export const InterviewProvider = ({ children }) => {
 
   // Auto-fetch categories on mount
   useEffect(() => {
-    actions.fetchCategories();
-  }, []);
+    const fetchInitialData = async () => {
+      dispatch({ type: ActionTypes.SET_LOADING, payload: true });
+      try {
+        // Fetch categories and stats in parallel
+        const [categoriesResponse, statsResponse] = await Promise.all([
+          interviewAPI.getCategories(),
+          interviewAPI.getStats()
+        ]);
+        
+        if (categoriesResponse.success) {
+          dispatch({ type: ActionTypes.SET_CATEGORIES, payload: categoriesResponse.data });
+        } else {
+          dispatch({ type: ActionTypes.SET_ERROR, payload: categoriesResponse.message });
+        }
+        
+        if (statsResponse.success) {
+          console.log('Stats API Response:', statsResponse.data);
+          dispatch({ type: ActionTypes.SET_STATS, payload: statsResponse.data });
+        } else {
+          console.error('Stats API failed:', statsResponse);
+        }
+      } catch (error) {
+        dispatch({ type: ActionTypes.SET_ERROR, payload: 'Failed to fetch data' });
+      }
+    };
+    
+    fetchInitialData();
+  }, []); // Empty dependency array
 
   const contextValue = {
     ...state,

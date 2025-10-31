@@ -1,13 +1,61 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Brain, Github, Twitter, Linkedin, Mail } from 'lucide-react';
 
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const handleLinkClick = (linkText) => {
+    switch (linkText) {
+      case 'Interview Hub':
+        navigate('/interview-hub');
+        break;
+      case 'Tech Blogs':
+        navigate('/tech-blogs');
+        break;
+      case 'AI Solver':
+        navigate('/ai-solver');
+        break;
+      case 'About Us':
+        // Could navigate to an about page or scroll to about section
+        alert('About Us page coming soon!');
+        break;
+      case 'Documentation':
+      case 'Tutorials':
+      case 'Community':
+      case 'Support':
+        alert(`${linkText} section coming soon!`);
+        break;
+      case 'Privacy Policy':
+      case 'Terms of Service':
+      case 'Contact':
+      case 'Careers':
+      case 'Cookie Policy':
+        alert(`${linkText} page coming soon!`);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleSocialClick = (platform) => {
+    const urls = {
+      'GitHub': 'https://github.com',
+      'Twitter': 'https://twitter.com',
+      'LinkedIn': 'https://linkedin.com',
+      'Email': 'mailto:contact@techpath.ai'
+    };
+    
+    if (urls[platform]) {
+      window.open(urls[platform], '_blank');
+    }
+  };
   const socialLinks = [
-    { icon: Github, href: '#', label: 'GitHub' },
-    { icon: Twitter, href: '#', label: 'Twitter' },
-    { icon: Linkedin, href: '#', label: 'LinkedIn' },
-    { icon: Mail, href: '#', label: 'Email' },
+    { icon: Github, href: 'https://github.com', label: 'GitHub' },
+    { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
+    { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
+    { icon: Mail, href: 'mailto:contact@techpath.ai', label: 'Email' },
   ];
 
   const footerLinks = [
@@ -44,16 +92,16 @@ const Footer = () => {
             {/* Social Links */}
             <div className="flex space-x-4">
               {socialLinks.map((social, index) => (
-                <motion.a
+                <motion.button
                   key={social.label}
-                  href={social.href}
+                  onClick={() => handleSocialClick(social.label)}
                   whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                   className="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-purple-400 hover:bg-purple-400/10 transition-colors duration-200"
                   aria-label={social.label}
                 >
                   <social.icon className="h-5 w-5" />
-                </motion.a>
+                </motion.button>
               ))}
             </div>
           </div>
@@ -65,12 +113,12 @@ const Footer = () => {
               <ul className="space-y-2">
                 {section.links.map((link) => (
                   <li key={link}>
-                    <a
-                      href="#"
-                      className="text-gray-400 hover:text-purple-400 text-sm transition-colors duration-200"
+                    <button
+                      onClick={() => handleLinkClick(link)}
+                      className="text-gray-400 hover:text-purple-400 text-sm transition-colors duration-200 text-left"
                     >
                       {link}
-                    </a>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -84,15 +132,24 @@ const Footer = () => {
             © 2025 TechPath.ai. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-gray-400 hover:text-purple-400 text-sm transition-colors duration-200">
+            <button 
+              onClick={() => handleLinkClick('Privacy Policy')}
+              className="text-gray-400 hover:text-purple-400 text-sm transition-colors duration-200"
+            >
               Privacy Policy
-            </a>
-            <a href="#" className="text-gray-400 hover:text-purple-400 text-sm transition-colors duration-200">
+            </button>
+            <button 
+              onClick={() => handleLinkClick('Terms of Service')}
+              className="text-gray-400 hover:text-purple-400 text-sm transition-colors duration-200"
+            >
               Terms of Service
-            </a>
-            <a href="#" className="text-gray-400 hover:text-purple-400 text-sm transition-colors duration-200">
+            </button>
+            <button 
+              onClick={() => handleLinkClick('Cookie Policy')}
+              className="text-gray-400 hover:text-purple-400 text-sm transition-colors duration-200"
+            >
               Cookie Policy
-            </a>
+            </button>
           </div>
         </div>
       </div>

@@ -1,8 +1,25 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 const Hero = () => {
+  const navigate = useNavigate();
+
+  const handleStartJourney = () => {
+    navigate('/interview-hub');
+  };
+
+  const handleExploreFeatures = () => {
+    // Scroll to features section or navigate to home features
+    const featuresSection = document.getElementById('features-section');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/#features');
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Elements */}
@@ -84,6 +101,7 @@ const Hero = () => {
           <motion.button
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
+            onClick={handleStartJourney}
             className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 flex items-center space-x-2"
           >
             <span>Start Your Journey</span>
@@ -93,6 +111,7 @@ const Hero = () => {
           <motion.button
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
+            onClick={handleExploreFeatures}
             className="bg-white/10 backdrop-blur-lg hover:bg-white/20 text-white font-semibold px-8 py-4 rounded-xl border border-white/20 hover:border-white/30 transition-all duration-200"
           >
             Explore Features

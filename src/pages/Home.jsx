@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Hero from '../components/Hero';
 import Card from '../components/Card';
 import { 
@@ -16,6 +17,11 @@ import {
 } from 'lucide-react';
 
 const Home = () => {
+  const navigate = useNavigate();
+
+  const handleFeatureClick = (link) => {
+    navigate(link);
+  };
   const features = [
     {
       icon: Users,
@@ -78,7 +84,7 @@ const Home = () => {
       <Hero />
 
       {/* Features Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section id="features-section" className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -115,7 +121,7 @@ const Home = () => {
                   title={feature.title}
                   description={feature.description}
                   variant="featured"
-                  onClick={() => window.location.href = feature.link}
+                  onClick={() => handleFeatureClick(feature.link)}
                 >
                   <div className="flex items-center text-purple-400 text-sm font-medium mt-4 group-hover:text-pink-400 transition-colors duration-200">
                     <span>Explore now</span>

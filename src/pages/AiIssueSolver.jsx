@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Card from '../components/Card';
+import LocalStorageService from '../services/localStorage';
 import { 
   Brain, 
   Send, 
@@ -9,27 +10,40 @@ import {
   Bug, 
   Lightbulb, 
   Zap,
-  MessageCircle,
   Upload,
   Settings,
   Star,
-  Clock,
-  CheckCircle,
   AlertCircle
 } from 'lucide-react';
 
 const AiIssueSolver = () => {
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      type: 'ai',
-      content: "Hello! I'm your AI coding assistant. I can help you debug code, explain complex concepts, and solve technical challenges. What would you like to work on today?",
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+
+  // Load chat history on component mount
+  useEffect(() => {
+    const savedMessages = LocalStorageService.getChatHistory();
+    if (savedMessages.length > 0) {
+      setMessages(savedMessages);
+    } else {
+      // Set default welcome message
+      setMessages([{
+        id: 1,
+        type: 'ai',
+        content: "Hello! I'm your AI coding assistant. I can help you debug code, explain complex concepts, and solve technical challenges. What would you like to work on today?",
+        timestamp: new Date()
+      }]);
+    }
+  }, []);
+
+  // Save messages to localStorage whenever messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      LocalStorageService.setChatHistory(messages);
+    }
+  }, [messages]);
 
   const quickActions = [
     {
@@ -112,21 +126,55 @@ const AiIssueSolver = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate AI response
+    // Enhanced AI response simulation
     setTimeout(() => {
+      const responses = {
+        'debug': "I can help you debug your code! Please share your code snippet and describe the issue you're experiencing. I'll analyze it and provide specific solutions.",
+        'review': "I'd be happy to review your code! Please paste your code here and I'll check for:\n• Code quality and best practices\n• Performance optimizations\n• Security considerations\n• Maintainability improvements",
+        'concept': "I'm here to explain programming concepts! What specific topic would you like me to break down? I can provide clear explanations with examples.",
+        'performance': "Let's optimize your code! Share the code you'd like to improve and I'll suggest:\n• Performance bottlenecks\n• Algorithm optimizations\n• Memory usage improvements\n• Best practices for efficiency",
+        'default': "I understand you're looking for help with that. While the AI Issue Solver is in active development, I can provide guidance on common coding problems. Try asking about debugging, code review, concept explanations, or performance optimization!"
+      };
+
+      let responseKey = 'default';
+      const lowerMessage = message.toLowerCase();
+      
+      if (lowerMessage.includes('debug') || lowerMessage.includes('bug') || lowerMessage.includes('error')) {
+        responseKey = 'debug';
+      } else if (lowerMessage.includes('review') || lowerMessage.includes('improve')) {
+        responseKey = 'review';
+      } else if (lowerMessage.includes('explain') || lowerMessage.includes('concept') || lowerMessage.includes('what is')) {
+        responseKey = 'concept';
+      } else if (lowerMessage.includes('optimize') || lowerMessage.includes('performance') || lowerMessage.includes('faster')) {
+        responseKey = 'performance';
+      }
+
       const aiResponse = {
         id: Date.now() + 1,
         type: 'ai',
-        content: "I understand you're looking for help with that. The AI Issue Solver is currently in development and will be available soon! In the meantime, you can explore our Interview Hub and Tech Blogs for comprehensive learning resources.",
+        content: responses[responseKey],
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
       setIsTyping(false);
-    }, 2000);
+    }, 1500 + Math.random() * 1000); // Variable delay for realism
   };
 
   const handleQuickAction = (action) => {
     handleSendMessage(action);
+  };
+
+  const handleClearChat = () => {
+    if (window.confirm('Are you sure you want to clear the chat history?')) {
+      const welcomeMessage = {
+        id: 1,
+        type: 'ai',
+        content: "Hello! I'm your AI coding assistant. I can help you debug code, explain complex concepts, and solve technical challenges. What would you like to work on today?",
+        timestamp: new Date()
+      };
+      setMessages([welcomeMessage]);
+      LocalStorageService.setChatHistory([welcomeMessage]);
+    }
   };
 
   const formatTime = (date) => {
@@ -197,9 +245,15 @@ const AiIssueSolver = () => {
                     </div>
                   </div>
                 </div>
-                <button className="p-2 text-gray-400 hover:text-white transition-colors duration-200">
-                  <Settings className="h-5 w-5" />
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button 
+                    onClick={handleClearChat}
+                    className="p-2 text-gray-400 hover:text-white transition-colors duration-200 rounded-lg hover:bg-white/10"
+                    title="Clear Chat"
+                  >
+                    <Settings className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
 
               {/* Messages */}

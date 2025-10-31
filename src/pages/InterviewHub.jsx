@@ -12,8 +12,6 @@ import {
   Smartphone, 
   Database,
   Search,
-  Filter,
-  Clock,
   Users,
   BookOpen,
   Play,
@@ -33,14 +31,33 @@ const InterviewHub = () => {
     selectedCategory, 
     loading, 
     error,
-    actions 
-  } = useInterview();
-  
-  const { expandedAnswers, toggleAnswer, clearExpandedAnswers } = useExpandedAnswers();
+    stats,
+    actions
+  } = useInterview();  const { expandedAnswers, toggleAnswer, clearExpandedAnswers } = useExpandedAnswers();
   const { searchTerm, handleSearchChange } = useSearch();
   const { toggleBookmark, isBookmarked } = useBookmarks();
   const { markQuestionAsViewed, markQuestionAsAnswered } = useProgress();
-  const { handleError, clearError } = useErrorHandler();
+  const { clearError } = useErrorHandler();
+
+  // Debug logging for stats
+  useEffect(() => {
+    console.log('InterviewHub stats:', stats);
+    console.log('Loading state:', loading);
+    console.log('Error state:', error);
+    
+    // Test API call directly
+    const testAPI = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/questions/stats');
+        const data = await response.json();
+        console.log('Direct API test:', data);
+      } catch (error) {
+        console.error('Direct API test failed:', error);
+      }
+    };
+    
+    testAPI();
+  }, [stats, loading, error]);
 
   // Icon mapping for dynamic rendering
   const iconMap = {
@@ -109,6 +126,16 @@ const InterviewHub = () => {
     toggleBookmark(questionId);
   };
 
+  // Handle mock interview join
+  const handleJoinMockInterview = (interviewTitle) => {
+    alert(`Joining ${interviewTitle}... This feature will connect you to a live mock interview session!`);
+    // In a real app, this would:
+    // 1. Check user authentication
+    // 2. Reserve a spot in the interview session
+    // 3. Navigate to the interview room
+    // 4. Set up video/audio connection
+  };
+
   // Clear error on mount
   useEffect(() => {
     if (error) {
@@ -166,7 +193,7 @@ const InterviewHub = () => {
               <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center">
                 <BookOpen className="h-8 w-8 text-purple-400 mx-auto mb-3" />
                 <div className="text-2xl font-bold text-white mb-1">
-                  {categories.reduce((total, cat) => total + (cat.questionCount || 0), 0)}
+                  {stats.totalQuestions}
                 </div>
                 <div className="text-gray-400 text-sm">Total Questions</div>
               </div>
@@ -174,7 +201,7 @@ const InterviewHub = () => {
               <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center">
                 <Users className="h-8 w-8 text-blue-400 mx-auto mb-3" />
                 <div className="text-2xl font-bold text-white mb-1">
-                  {categories.length}
+                  {stats.totalCategories}
                 </div>
                 <div className="text-gray-400 text-sm">Categories</div>
               </div>
@@ -182,7 +209,7 @@ const InterviewHub = () => {
               <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center">
                 <Eye className="h-8 w-8 text-green-400 mx-auto mb-3" />
                 <div className="text-2xl font-bold text-white mb-1">
-                  {categories.reduce((total, cat) => total + (cat.totalViews || 0), 0).toLocaleString()}
+                  {stats.totalViews?.toLocaleString() || 0}
                 </div>
                 <div className="text-gray-400 text-sm">Total Views</div>
               </div>
@@ -190,7 +217,7 @@ const InterviewHub = () => {
               <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center">
                 <CheckCircle className="h-8 w-8 text-yellow-400 mx-auto mb-3" />
                 <div className="text-2xl font-bold text-white mb-1">
-                  {categories.reduce((total, cat) => total + (cat.popularQuestions || 0), 0)}
+                  {stats.popularQuestions}
                 </div>
                 <div className="text-gray-400 text-sm">Popular Questions</div>
               </div>
@@ -512,7 +539,10 @@ const InterviewHub = () => {
                       </div>
                     </div>
 
-                    <button className="w-full bg-white/10 hover:bg-white/20 text-white font-medium py-2 rounded-lg border border-white/20 transition-all duration-200">
+                    <button 
+                      onClick={() => handleJoinMockInterview(interview.title)}
+                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-2 rounded-lg transition-all duration-200"
+                    >
                       Join Session
                     </button>
                   </div>

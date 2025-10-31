@@ -205,7 +205,7 @@ export const sortBy = (array, criteria) => {
   });
 };
 
-export default {
+const helpers = {
   formatDate,
   formatRelativeTime,
   getDifficultyColor,
@@ -225,3 +225,5 @@ export default {
   groupBy,
   sortBy
 };
+
+export default helpers;
