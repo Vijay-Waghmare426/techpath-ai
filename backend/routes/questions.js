@@ -41,14 +41,22 @@ router.get('/', async (req, res) => {
       .find(query)
       .sort({ popular: -1, views: -1, createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(parseInt(limit))
+      .lean(); // Convert to plain JS objects
     
     // Get total count for pagination
     const total = await InterviewQuestion.countDocuments(query);
     
+    // Transform _id to id for frontend compatibility
+    const transformedQuestions = questions.map(q => ({
+      ...q,
+      id: q._id.toString(),
+      _id: q._id.toString()
+    }));
+    
     res.json({
       success: true,
-      data: questions,
+      data: transformedQuestions,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
@@ -91,7 +99,11 @@ router.get('/categories', async (req, res) => {
       id: cat._id,
       name: categoryMap[cat._id]?.name || cat._id,
       icon: categoryMap[cat._id]?.icon || 'Code',
-      count: cat.count
+      count: cat.count,
+      color: 'from-purple-500 to-pink-500',
+      description: `Master ${categoryMap[cat._id]?.name || cat._id} concepts with our curated questions`,
+      questionCount: cat.count,
+      popular: cat.count > 10
     }));
     
     res.json({

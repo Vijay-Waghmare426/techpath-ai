@@ -119,7 +119,7 @@ const AiIssueSolver = () => {
       id: Date.now(),
       type: 'user',
       content: message,
-      timestamp: new Date()
+      timestamp: new Date().toISOString()  // Store as ISO string for consistency
     };
 
     setMessages(prev => [...prev, newMessage]);
@@ -153,7 +153,7 @@ const AiIssueSolver = () => {
         id: Date.now() + 1,
         type: 'ai',
         content: responses[responseKey],
-        timestamp: new Date()
+        timestamp: new Date().toISOString()  // Store as ISO string for consistency
       };
       setMessages(prev => [...prev, aiResponse]);
       setIsTyping(false);
@@ -170,7 +170,7 @@ const AiIssueSolver = () => {
         id: 1,
         type: 'ai',
         content: "Hello! I'm your AI coding assistant. I can help you debug code, explain complex concepts, and solve technical challenges. What would you like to work on today?",
-        timestamp: new Date()
+        timestamp: new Date().toISOString()  // Store as ISO string for consistency
       };
       setMessages([welcomeMessage]);
       LocalStorageService.setChatHistory([welcomeMessage]);
@@ -178,6 +178,9 @@ const AiIssueSolver = () => {
   };
 
   const formatTime = (date) => {
+    if (!(date instanceof Date)) {
+      date = new Date(date);
+    }
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 

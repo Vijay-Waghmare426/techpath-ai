@@ -1,5 +1,5 @@
 // API service for interview-related data
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
 // API Client with error handling
 class APIClient {
@@ -63,11 +63,10 @@ export const interviewAPI = {
       });
       
       const response = await APIClient.get(`/questions?${queryParams}`);
-      return response; // Return the full response which includes success: true
+      return response;
     } catch (error) {
       console.error('Error fetching questions:', error);
-      // Fallback to mock data if API fails
-      return { success: true, data: getMockQuestionsByCategory(categoryId) };
+      throw error; // Don't fallback to mock data, let the error propagate
     }
   },
 
@@ -93,22 +92,33 @@ export const interviewAPI = {
   // Get statistics
   async getStats() {
     try {
-      console.log('Making API call to:', `${API_BASE_URL}/questions/stats`);
       const response = await APIClient.get('/questions/stats');
-      console.log('Stats API response:', response);
-      return response; // Return the full response which includes success: true
+      return response;
     } catch (error) {
       console.error('Error fetching stats:', error);
-      // Return fallback stats
-      return {
-        success: true,
-        data: {
-          totalQuestions: 0,
-          totalCategories: 0,
-          totalViews: 0,
-          popularQuestions: 0
-        }
-      };
+      throw error;
+    }
+  },
+
+  // Update question views
+  async incrementViews(questionId) {
+    try {
+      const response = await APIClient.get(`/questions/${questionId}`);
+      return response;
+    } catch (error) {
+      console.error('Error incrementing views:', error);
+      throw error;
+    }
+  },
+
+  // Update question likes
+  async incrementLikes(questionId) {
+    try {
+      const response = await APIClient.put(`/questions/${questionId}/like`);
+      return response;
+    } catch (error) {
+      console.error('Error incrementing likes:', error);
+      throw error;
     }
   }
 };

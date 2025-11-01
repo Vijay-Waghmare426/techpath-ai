@@ -205,12 +205,20 @@ export const InterviewProvider = ({ children }) => {
     // Update question stats (views, likes)
     updateQuestionStats: async (questionId, statType) => {
       try {
-        const response = await interviewAPI.updateQuestionStats(questionId, statType);
-        if (response.success) {
+        let response;
+        if (statType === 'views') {
+          response = await interviewAPI.incrementViews(questionId);
+        } else if (statType === 'likes') {
+          response = await interviewAPI.incrementLikes(questionId);
+        }
+
+        if (response?.success) {
           dispatch({
             type: ActionTypes.UPDATE_QUESTION_STATS,
             payload: { questionId, statType }
           });
+          // Refresh stats after updating
+          actions.fetchStats();
         }
       } catch (error) {
         console.error(`Failed to update ${statType}:`, error);

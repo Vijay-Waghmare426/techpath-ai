@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Card from '../components/Card';
 import { useInterview } from '../context/InterviewContext';
+import { Heart } from 'lucide-react';
 import { useExpandedAnswers, useSearch, useBookmarks, useProgress, useErrorHandler } from '../hooks/useInterview';
 import { getDifficultyColor } from '../utils/helpers';
 import { 
@@ -110,8 +111,9 @@ const InterviewHub = () => {
   // Handle answer toggle with view tracking
   const handleAnswerToggle = (questionId) => {
     toggleAnswer(questionId);
-    markQuestionAsViewed(questionId);
     if (!expandedAnswers[questionId]) {
+      actions.updateQuestionStats(questionId, 'views');
+      markQuestionAsViewed(questionId);
       markQuestionAsAnswered(questionId);
     }
   };
@@ -423,9 +425,19 @@ const InterviewHub = () => {
                             
                             <div className="ml-4 flex items-center space-x-2">
                               <button
-                                onClick={() => handleBookmarkToggle(question.id)}
+                                onClick={() => actions.updateQuestionStats(question._id, 'likes')}
+                                className="p-2 rounded-lg transition-colors bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white"
+                                title="Like this question"
+                              >
+                                <div className="flex items-center">
+                                  <Heart className={`h-4 w-4 ${question.likes > 0 ? 'text-red-400' : ''}`} />
+                                  <span className="ml-1 text-sm">{question.likes || 0}</span>
+                                </div>
+                              </button>
+                              <button
+                                onClick={() => handleBookmarkToggle(question._id)}
                                 className={`p-2 rounded-lg transition-colors ${
-                                  isBookmarked(question.id)
+                                  isBookmarked(question._id)
                                     ? 'bg-purple-600 text-white'
                                     : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white'
                                 }`}
