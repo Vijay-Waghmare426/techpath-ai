@@ -17,7 +17,7 @@ const initialState = {
   stats: {
     totalQuestions: 0,
     totalCategories: 0,
-    totalViews: 0,
+
     popularQuestions: 0
   }
 };
@@ -206,9 +206,7 @@ export const InterviewProvider = ({ children }) => {
     updateQuestionStats: async (questionId, statType) => {
       try {
         let response;
-        if (statType === 'views') {
-          response = await interviewAPI.incrementViews(questionId);
-        } else if (statType === 'likes') {
+ if (statType === 'likes') {
           response = await interviewAPI.incrementLikes(questionId);
         }
 

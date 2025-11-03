@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
     // Execute query
     const questions = await InterviewQuestion
       .find(query)
-      .sort({ popular: -1, views: -1, createdAt: -1 })
+      .sort({ popular: -1, createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
       .lean(); // Convert to plain JS objects
@@ -125,16 +125,11 @@ router.get('/categories', async (req, res) => {
 // @access  Public
 router.get('/stats', async (req, res) => {
   try {
-    const totalQuestions = await InterviewQuestion.countDocuments({ isActive: true });
     const totalCategories = await InterviewQuestion.distinct('category', { isActive: true });
     const popularQuestions = await InterviewQuestion.countDocuments({ popular: true, isActive: true });
     
-    // Calculate total views across all questions
-    const totalViewsResult = await InterviewQuestion.aggregate([
-      { $match: { isActive: true } },
-      { $group: { _id: null, totalViews: { $sum: '$views' } } }
-    ]);
-    const totalViews = totalViewsResult.length > 0 ? totalViewsResult[0].totalViews : 0;
+    // Get total count of questions
+    const totalQuestions = await InterviewQuestion.countDocuments({ isActive: true });
     
     // Get difficulty distribution
     const difficultyStats = await InterviewQuestion.aggregate([
@@ -145,15 +140,15 @@ router.get('/stats', async (req, res) => {
     // Get category distribution with question counts
     const categoryStats = await InterviewQuestion.aggregate([
       { $match: { isActive: true } },
-      { $group: { _id: '$category', count: { $sum: 1 }, totalViews: { $sum: '$views' } } },
+      { $group: { _id: '$category', count: { $sum: 1 } } },
       { $sort: { count: -1 } }
     ]);
     
     // Get most viewed questions
     const mostViewedQuestions = await InterviewQuestion.find({ isActive: true })
-      .sort({ views: -1 })
+      .sort({ createdAt: -1 })
       .limit(5)
-      .select('question category difficulty views');
+      .select('question category difficulty');
     
     res.json({
       success: true,
@@ -161,7 +156,7 @@ router.get('/stats', async (req, res) => {
         totalQuestions,
         totalCategories: totalCategories.length,
         popularQuestions,
-        totalViews,
+
         difficultyDistribution: difficultyStats,
         categoryDistribution: categoryStats,
         mostViewedQuestions
@@ -191,8 +186,7 @@ router.get('/:id', async (req, res) => {
       });
     }
     
-    // Increment views
-    await question.incrementViews();
+
     
     res.json({
       success: true,

@@ -100,16 +100,7 @@ export const interviewAPI = {
     }
   },
 
-  // Update question views
-  async incrementViews(questionId) {
-    try {
-      const response = await APIClient.get(`/questions/${questionId}`);
-      return response;
-    } catch (error) {
-      console.error('Error incrementing views:', error);
-      throw error;
-    }
-  },
+  
 
   // Update question likes
   async incrementLikes(questionId) {
@@ -146,7 +137,7 @@ function getMockQuestionsByCategory(categoryId) {
       tags: ["JavaScript", "ES6", "Variables"],
       answer: "var is function-scoped and can be redeclared, let is block-scoped and can be reassigned, const is block-scoped and cannot be reassigned.",
       popular: true,
-      views: 1250,
+
       likes: 89
     },
     {
@@ -158,7 +149,7 @@ function getMockQuestionsByCategory(categoryId) {
       tags: ["JavaScript", "Closures", "Scope"],
       answer: "A closure is a function that has access to variables in its outer scope even after the outer function has returned.",
       popular: false,
-      views: 890,
+
       likes: 67
     }
   ];

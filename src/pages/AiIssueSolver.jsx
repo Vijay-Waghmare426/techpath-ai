@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Card from '../components/Card';
 import LocalStorageService from '../services/localStorage';
+import { aiService } from '../services/aiService';
 import { 
   Brain, 
   Send, 
@@ -112,52 +113,44 @@ const AiIssueSolver = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSendMessage = (message = inputMessage) => {
+    const handleSendMessage = async (message = inputMessage) => {
     if (!message.trim()) return;
 
     const newMessage = {
       id: Date.now(),
       type: 'user',
       content: message,
-      timestamp: new Date().toISOString()  // Store as ISO string for consistency
+      timestamp: new Date().toISOString()
     };
 
     setMessages(prev => [...prev, newMessage]);
     setInputMessage('');
     setIsTyping(true);
 
-    // Enhanced AI response simulation
-    setTimeout(() => {
-      const responses = {
-        'debug': "I can help you debug your code! Please share your code snippet and describe the issue you're experiencing. I'll analyze it and provide specific solutions.",
-        'review': "I'd be happy to review your code! Please paste your code here and I'll check for:\n• Code quality and best practices\n• Performance optimizations\n• Security considerations\n• Maintainability improvements",
-        'concept': "I'm here to explain programming concepts! What specific topic would you like me to break down? I can provide clear explanations with examples.",
-        'performance': "Let's optimize your code! Share the code you'd like to improve and I'll suggest:\n• Performance bottlenecks\n• Algorithm optimizations\n• Memory usage improvements\n• Best practices for efficiency",
-        'default': "I understand you're looking for help with that. While the AI Issue Solver is in active development, I can provide guidance on common coding problems. Try asking about debugging, code review, concept explanations, or performance optimization!"
-      };
-
-      let responseKey = 'default';
-      const lowerMessage = message.toLowerCase();
+    try {
+      // Get AI response from the API
+      const aiResponseText = await aiService.getChatResponse(message);
       
-      if (lowerMessage.includes('debug') || lowerMessage.includes('bug') || lowerMessage.includes('error')) {
-        responseKey = 'debug';
-      } else if (lowerMessage.includes('review') || lowerMessage.includes('improve')) {
-        responseKey = 'review';
-      } else if (lowerMessage.includes('explain') || lowerMessage.includes('concept') || lowerMessage.includes('what is')) {
-        responseKey = 'concept';
-      } else if (lowerMessage.includes('optimize') || lowerMessage.includes('performance') || lowerMessage.includes('faster')) {
-        responseKey = 'performance';
-      }
-
       const aiResponse = {
         id: Date.now() + 1,
         type: 'ai',
-        content: responses[responseKey],
-        timestamp: new Date().toISOString()  // Store as ISO string for consistency
+        content: aiResponseText,
+        timestamp: new Date().toISOString()
       };
+      
       setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('Error:', error);
+      const errorResponse = {
+        id: Date.now() + 1,
+        type: 'ai',
+        content: "Sorry, I encountered an error. Please try again.",
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
       setIsTyping(false);
-    }, 1500 + Math.random() * 1000); // Variable delay for realism
+    }
   };
 
   const handleQuickAction = (action) => {

@@ -1,10 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import axios from 'axios';
 
 const Hero = () => {
   const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    interviewQuestions: 0,
+    techArticles: 0,
+    aiSupport: "24/7"
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get('http://localhost:5001/api/stats/home');
+        if (response.data.success) {
+          setStats(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   const handleStartJourney = () => {
     navigate('/interview-hub');
@@ -125,10 +149,19 @@ const Hero = () => {
           transition={{ duration: 0.8, delay: 0.8 }}
           className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto"
         >
-          {[
-            { number: "500+", label: "Interview Questions" },
-            { number: "100+", label: "Tech Articles" },
-            { number: "24/7", label: "AI Support" },
+          {loading ? (
+            // Loading skeleton for stats
+            <div className="col-span-3 flex justify-center items-center">
+              <div className="animate-pulse flex space-x-12">
+                <div className="h-12 w-24 bg-white/10 rounded"></div>
+                <div className="h-12 w-24 bg-white/10 rounded"></div>
+                <div className="h-12 w-24 bg-white/10 rounded"></div>
+              </div>
+            </div>
+          ) : [
+            { number: stats.interviewQuestions, label: "Interview Questions" },
+            { number: stats.techArticles, label: "Tech Articles" },
+            { number: stats.aiSupport, label: "AI Support" },
           ].map((stat, index) => (
             <div key={index} className="text-center">
               <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">

@@ -36,10 +36,6 @@ const interviewQuestionSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  views: {
-    type: Number,
-    default: 0
-  },
   likes: {
     type: Number,
     default: 0
@@ -59,7 +55,7 @@ const interviewQuestionSchema = new mongoose.Schema({
 // Indexes for better query performance
 interviewQuestionSchema.index({ category: 1, difficulty: 1 });
 interviewQuestionSchema.index({ tags: 1 });
-interviewQuestionSchema.index({ popular: -1, views: -1 });
+interviewQuestionSchema.index({ popular: -1 });
 
 // Virtual for question summary
 interviewQuestionSchema.virtual('summary').get(function() {
@@ -78,12 +74,6 @@ interviewQuestionSchema.statics.getPopular = function(limit = 10) {
   return this.find({ popular: true, isActive: true })
     .sort({ views: -1 })
     .limit(limit);
-};
-
-// Instance method to increment views
-interviewQuestionSchema.methods.incrementViews = function() {
-  this.views += 1;
-  return this.save();
 };
 
 module.exports = mongoose.model('InterviewQuestion', interviewQuestionSchema);

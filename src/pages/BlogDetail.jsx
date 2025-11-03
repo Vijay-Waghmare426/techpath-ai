@@ -186,7 +186,7 @@ const BlogDetail = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Eye className="h-4 w-4" />
-                <span>{post.views.toLocaleString()} views</span>
+
               </div>
             </div>
 

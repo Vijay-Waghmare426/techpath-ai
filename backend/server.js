@@ -9,6 +9,8 @@ require('dotenv').config();
 // Import routes
 const questionRoutes = require('./routes/questions');
 const blogRoutes = require('./routes/blogs');
+const chatRoutes = require('./routes/chat');
+const statsRoutes = require('./routes/stats');
 
 const app = express();
 
@@ -61,6 +63,8 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/questions', questionRoutes);
 app.use('/api/blogs', blogRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api', chatRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

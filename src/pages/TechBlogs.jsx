@@ -28,7 +28,7 @@ const TechBlogs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [likedPosts, setLikedPosts] = useState(new Set());
   const [bookmarkedPosts, setBookmarkedPosts] = useState(new Set());
-  const [viewCounts, setViewCounts] = useState({});
+
   const [blogPosts, setBlogPosts] = useState([]);
   const [featuredPost, setFeaturedPost] = useState(null);
   const [trendingTopics, setTrendingTopics] = useState([]);
@@ -129,11 +129,6 @@ const TechBlogs = () => {
   };
 
   const handleReadMore = (post) => {
-    setViewCounts(prev => ({
-      ...prev,
-      [post.id]: (prev[post.id] || 0) + 1
-    }));
-    
     // Create a slug from the title and ID
     const slug = `${post.title
       .toLowerCase()
@@ -478,10 +473,7 @@ const TechBlogs = () => {
                           <span className="text-white text-sm">{post.author?.name || post.author}</span>
                         </div>
                         <div className="flex items-center space-x-3 text-gray-400 text-sm">
-                          <div className="flex items-center space-x-1">
-                            <Eye className="h-4 w-4" />
-                            <span>{(post.views + (viewCounts[post.id] || 0)).toLocaleString()}</span>
-                          </div>
+
                           <div className="flex items-center space-x-1">
                             <button 
                               onClick={(e) => {

@@ -112,7 +112,7 @@ const InterviewHub = () => {
   const handleAnswerToggle = (questionId) => {
     toggleAnswer(questionId);
     if (!expandedAnswers[questionId]) {
-      actions.updateQuestionStats(questionId, 'views');
+
       markQuestionAsViewed(questionId);
       markQuestionAsAnswered(questionId);
     }
@@ -182,51 +182,7 @@ const InterviewHub = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      {!loading && !error && !selectedCategory && (
-        <section className="px-4 sm:px-6 lg:px-8 mb-12">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-6"
-            >
-              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center">
-                <BookOpen className="h-8 w-8 text-purple-400 mx-auto mb-3" />
-                <div className="text-2xl font-bold text-white mb-1">
-                  {stats.totalQuestions}
-                </div>
-                <div className="text-gray-400 text-sm">Total Questions</div>
-              </div>
-              
-              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center">
-                <Users className="h-8 w-8 text-blue-400 mx-auto mb-3" />
-                <div className="text-2xl font-bold text-white mb-1">
-                  {stats.totalCategories}
-                </div>
-                <div className="text-gray-400 text-sm">Categories</div>
-              </div>
-              
-              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center">
-                <Eye className="h-8 w-8 text-green-400 mx-auto mb-3" />
-                <div className="text-2xl font-bold text-white mb-1">
-                  {stats.totalViews?.toLocaleString() || 0}
-                </div>
-                <div className="text-gray-400 text-sm">Total Views</div>
-              </div>
-              
-              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 text-center">
-                <CheckCircle className="h-8 w-8 text-yellow-400 mx-auto mb-3" />
-                <div className="text-2xl font-bold text-white mb-1">
-                  {stats.popularQuestions}
-                </div>
-                <div className="text-gray-400 text-sm">Popular Questions</div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-      )}
+
 
       {/* Search and Filters - Only show when category is selected */}
       {selectedCategory && (
